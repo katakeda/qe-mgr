@@ -20,7 +20,7 @@
     acceptedTickets,
     rejectedTickets: Array<Ticket>;
   (async () => {
-    const response = await fetch('http://localhost:8080/api/tickets/');
+    const response = await fetch('/api/tickets/');
     let tickets: Array<Ticket> = await response.json();
     tickets = tickets.map((ticket) => ({
       ...ticket,
