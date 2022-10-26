@@ -17,7 +17,7 @@ use crate::{
 };
 
 #[derive(Deserialize)]
-pub struct Filter {
+pub struct TicketFilter {
     pub status: Option<TicketStatus>,
 }
 
@@ -56,7 +56,7 @@ pub async fn find(id: Path<String>, repo: Data<Inmem>) -> Result<impl Responder>
 }
 
 #[get("/")]
-pub async fn find_all(filter: Query<Filter>, repo: Data<Inmem>) -> Result<impl Responder> {
+pub async fn find_all(filter: Query<TicketFilter>, repo: Data<Inmem>) -> Result<impl Responder> {
     let mut ticket_responses = vec![];
     for ticket in repo.get_tickets(&filter).iter() {
         ticket_responses.push(create_ticket_response(ticket.clone(), repo.clone()));

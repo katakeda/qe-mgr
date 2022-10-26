@@ -1,5 +1,5 @@
 use actix_web::{
-    post,
+    get, post,
     web::{scope, Data, Json, ServiceConfig},
     Responder, Result,
 };
@@ -13,6 +13,11 @@ pub struct CreateUser {
     pub name: String,
 }
 
+#[get("/")]
+pub async fn find_all(repo: Data<Inmem>) -> Result<impl Responder> {
+    Ok(Json(repo.get_users()))
+}
+
 #[post("/")]
 pub async fn create(body: Json<CreateUser>, repo: Data<Inmem>) -> Result<impl Responder> {
     let user = User {
@@ -24,5 +29,5 @@ pub async fn create(body: Json<CreateUser>, repo: Data<Inmem>) -> Result<impl Re
 }
 
 pub fn user_api(cfg: &mut ServiceConfig) {
-    cfg.service(scope("/users").service(create));
+    cfg.service(scope("/users").service(find_all).service(create));
 }

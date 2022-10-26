@@ -7,7 +7,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::ticket::Filter,
+    api::ticket::TicketFilter,
     model::{ticket::Ticket, user::User},
 };
 
@@ -65,7 +65,7 @@ impl Inmem {
         new_state
     }
 
-    pub fn _get_users(&self) -> Vec<User> {
+    pub fn get_users(&self) -> Vec<User> {
         self.users
             .lock()
             .unwrap()
@@ -90,7 +90,7 @@ impl Inmem {
         self.users.lock().unwrap().remove(&id);
     }
 
-    pub fn get_tickets(&self, filter: &Filter) -> Vec<Ticket> {
+    pub fn get_tickets(&self, filter: &TicketFilter) -> Vec<Ticket> {
         self.tickets
             .lock()
             .unwrap()
