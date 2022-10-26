@@ -1,18 +1,20 @@
 <script lang="ts">
-  import type { Ticket } from './types.svelte';
+  import type { Ticket, User } from './types.svelte';
   export let ticket: Ticket;
 
   let editingTitle = false;
   let editingDescription = false;
   let editingAssignedTo = false;
   let editingStatus = false;
-  let updatedTicket = ticket;
+  let updatedTicket = { ...ticket };
+  let availableUsers: Array<User>;
 
-  const availableUsers = [
-    { id: '1', name: 'Justin' },
-    { id: '2', name: 'Kaitaku' },
-    { id: '3', name: 'Takeda' },
-  ];
+  (async () => {
+    const response = await fetch('/api/users/');
+    const users = await response.json();
+    availableUsers = users;
+  })();
+
   const statuses = [
     { value: 'New', label: 'Ready For Review' },
     { value: 'Pending', label: 'In Review' },
@@ -20,27 +22,48 @@
     { value: 'Rejected', label: 'Rejected' },
   ];
 
-  const resetTicket = () => {
-    updatedTicket = ticket;
+  const resetTicket = (field: string) => {
+    const clone = { ...ticket };
+    updatedTicket[field] = clone[field];
   };
 
-  const updateTicket = () => {};
-
-  const saveTicket = () => {};
+  const saveTicket = async (fields: any) => {
+    const options = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...fields }),
+    };
+    const response = await fetch(`/api/tickets/${ticket.id}`, options);
+    const savedTicket = await response.json();
+    updatedTicket = savedTicket[0];
+    ticket = { ...updatedTicket };
+  };
 </script>
 
 <div class="card-detail">
   <div class="card-detail-group card-detail-title">
     {#if editingTitle}
       <div class="card-detail-label-group">
-        <input type="text" value={ticket.title} />
+        <input type="text" bind:value={updatedTicket.title} />
       </div>
       <div class="card-detail-button-group">
-        <button on:click={() => (editingTitle = false)}>Cancel</button>
-        <button on:click={() => (editingTitle = false)}>Save</button>
+        <button
+          on:click={() => {
+            editingTitle = false;
+            resetTicket('title');
+          }}>Cancel</button
+        >
+        <button
+          on:click={() => {
+            editingTitle = false;
+            saveTicket({ title: updatedTicket.title });
+          }}>Save</button
+        >
       </div>
     {:else}
-      <div class="card-detail-label-group"><span>{ticket.title}</span></div>
+      <div class="card-detail-label-group">
+        <span>{ticket.title}</span>
+      </div>
       <div class="card-detail-button-group">
         <button on:click={() => (editingTitle = true)}>Edit</button>
       </div>
@@ -50,14 +73,19 @@
     <span>Description: </span>
     {#if editingDescription}
       <div class="card-detail-label-group">
-        <textarea>{ticket.description}</textarea>
+        <textarea bind:value={updatedTicket.description} />
       </div>
       <div class="card-detail-button-group">
-        <button on:click={() => (editingDescription = false)}>Cancel</button>
         <button
           on:click={() => {
             editingDescription = false;
-            updateTicket();
+            resetTicket('description');
+          }}>Cancel</button
+        >
+        <button
+          on:click={() => {
+            editingDescription = false;
+            saveTicket({ description: updatedTicket.description });
           }}>Save</button
         >
       </div>
@@ -74,21 +102,33 @@
     <span>Assigned To: </span>
     {#if editingAssignedTo}
       <div class="card-detail-label-group">
-        <select>
+        <select bind:value={updatedTicket.assigned_to.id}>
           {#each availableUsers as user}
-            <option value={user.id} selected={user.id == ticket.assignedTo}
+            <option
+              value={user.id}
+              selected={user.id == updatedTicket.assigned_to.id}
               >{user.name}</option
             >
           {/each}
         </select>
       </div>
       <div class="card-detail-button-group">
-        <button on:click={() => (editingAssignedTo = false)}>Cancel</button>
-        <button on:click={() => (editingAssignedTo = false)}>Save</button>
+        <button
+          on:click={() => {
+            editingAssignedTo = false;
+            resetTicket('assigned_to');
+          }}>Cancel</button
+        >
+        <button
+          on:click={() => {
+            editingAssignedTo = false;
+            saveTicket({ assigned_to: updatedTicket.assigned_to.id });
+          }}>Save</button
+        >
       </div>
     {:else}
       <div class="card-detail-label-group">
-        <span>{ticket.assignedTo}</span>
+        <span>{ticket.assigned_to.name}</span>
       </div>
       <div class="card-detail-button-group">
         <button on:click={() => (editingAssignedTo = true)}>Edit</button>
@@ -99,18 +139,29 @@
     <span>Status: </span>
     {#if editingStatus}
       <div class="card-detail-label-group">
-        <select>
+        <select bind:value={updatedTicket.status}>
           {#each statuses as status}
             <option
               value={status.value}
-              selected={status.value == ticket.status}>{status.label}</option
+              selected={status.value == updatedTicket.status}
+              >{status.label}</option
             >
           {/each}
         </select>
       </div>
       <div class="card-detail-button-group">
-        <button on:click={() => (editingStatus = false)}>Cancel</button>
-        <button on:click={() => (editingStatus = false)}>Save</button>
+        <button
+          on:click={() => {
+            editingStatus = false;
+            resetTicket('status');
+          }}>Cancel</button
+        >
+        <button
+          on:click={() => {
+            editingStatus = false;
+            saveTicket({ status: updatedTicket.status });
+          }}>Save</button
+        >
       </div>
     {:else}
       <div class="card-detail-label-group">
