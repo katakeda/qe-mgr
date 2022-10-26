@@ -1,23 +1,79 @@
 <script lang="ts">
-  export let title = 'New Card';
-  export let description = '';
-  export let assignedTo = 'Unassigned';
+  import type { Ticket } from './types.svelte';
+  export let ticket: Ticket = {
+    title: 'New Card',
+    description: '',
+    assignedTo: 'Unassigned',
+  };
+
+  import { getContext } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import type Modal from 'svelte-simple-modal';
+  import Icon from 'svelte-awesome';
+  import { arrowCircleOUp, arrowCircleODown } from 'svelte-awesome/icons';
+  import CardDetail from './CardDetail.svelte';
+  const { open }: Modal = getContext('simple-modal');
+  const openCardDetail = () => {
+    open(CardDetail, { ticket });
+  };
+  const arrowIconStyle = 'height: 24px; width: 24px; fill: #d3d3d3;';
+
+  let showCardCtrls = false;
+  const toggleCardCtrls = () => (showCardCtrls = !showCardCtrls);
+
+  const moveRankUp = () => {};
+  const moveRankDown = () => {};
 </script>
 
-<div class="card">
-  <div class="card-title">{title}</div>
-  <div class="card-description">{description}</div>
-  <div class="card-assigned-to">{assignedTo}</div>
+<div
+  class="card"
+  on:click|self={openCardDetail}
+  on:keypress={null}
+  on:mouseenter={toggleCardCtrls}
+  on:mouseleave={toggleCardCtrls}
+>
+  <div class="card-detail" on:click={openCardDetail} on:keypress={null}>
+    <div class="card-title">{ticket.title}</div>
+    <div class="card-description">{ticket.description}</div>
+    <div class="card-assigned-to">{ticket.assignedTo}</div>
+  </div>
+  {#if showCardCtrls}
+    <div class="card-ctrls" transition:fade={{ duration: 250 }}>
+      <span on:click={moveRankUp} on:keypress={null}>
+        <Icon data={arrowCircleOUp} style={arrowIconStyle} />
+      </span>
+      <span on:click={moveRankDown} on:keypress={null}>
+        <Icon data={arrowCircleODown} style={arrowIconStyle} />
+      </span>
+    </div>
+  {/if}
 </div>
 
 <style>
   .card {
-    padding: 5px;
     width: 100%;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-      0 8px 10px -6px rgb(0 0 0 / 0.1);
+    min-height: 80px;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
     margin-top: 16px;
     cursor: pointer;
-    background-color: #f5f5dc;
+    background-color: #fff;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .card:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+  .card-detail {
+    padding: 10px;
+  }
+  .card-ctrls {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 0 10px;
   }
 </style>

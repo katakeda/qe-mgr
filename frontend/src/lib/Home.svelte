@@ -1,19 +1,7 @@
 <script lang="ts">
+  import Modal from 'svelte-simple-modal';
   import Board from './Board.svelte';
-
-  interface User {
-    id: string;
-    name: string;
-  }
-
-  interface Ticket {
-    id: string;
-    title: string;
-    description: string;
-    status: string;
-    assigned_to: User;
-    assignedTo: string;
-  }
+  import type { Ticket } from './types.svelte';
 
   let newTickets,
     pendingTickets,
@@ -35,10 +23,12 @@
 </script>
 
 <div class="home">
-  <Board title="New" tickets={newTickets} />
-  <Board title="In Review" tickets={pendingTickets} />
-  <Board title="Accepted" tickets={acceptedTickets} />
-  <Board title="Rejected" tickets={rejectedTickets} />
+  <Modal>
+    <Board title="Ready For Review" tickets={newTickets} />
+    <Board title="In Review" tickets={pendingTickets} />
+    <Board title="Accepted" tickets={acceptedTickets} />
+    <Board title="Rejected" tickets={rejectedTickets} />
+  </Modal>
 </div>
 
 <style>

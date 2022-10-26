@@ -8,11 +8,7 @@
   <div class="board-title">{title}</div>
   <div class="card-container">
     {#each tickets as ticket}
-      <Card
-        title={ticket.title}
-        description={ticket.description}
-        assignedTo={ticket.assignedTo}
-      />
+      <Card {ticket} />
     {/each}
   </div>
 </div>
@@ -21,10 +17,9 @@
   .board {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    background-color: #fffff1;
-    height: 700px;
+    background-color: #f7f7f7;
     width: 20%;
+    height: 80%;
     padding: 16px;
     border-radius: 10px;
   }
@@ -34,8 +29,6 @@
     color: #808080;
   }
   .card-container {
-    display: flex;
-    flex-direction: column;
     height: 100%;
     width: 100%;
     border-radius: 10px;
