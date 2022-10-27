@@ -1,0 +1,105 @@
+<script lang="ts">
+  export let status: String;
+  import { getContext } from 'svelte';
+  import type Modal from 'svelte-simple-modal';
+  import type { Ticket, User } from './types.svelte';
+  const { close }: Modal = getContext('simple-modal');
+
+  const getUsers = async (): Promise<Array<User>> => {
+    const response = await fetch('/api/users/');
+    return await response.json();
+  };
+
+  let availableUsers = getUsers();
+  let newTicket: Ticket = {};
+
+  const resetTicket = () => {
+    newTicket = {};
+  };
+
+  const saveTicket = async () => {
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...newTicket,
+        assigned_to: newTicket.assignedTo,
+        status,
+      }),
+    };
+    const response = await fetch('/api/tickets/', options);
+    await response.json();
+    close();
+  };
+</script>
+
+<div class="new-ticket">
+  <div class="new-ticket-group">
+    <span>Title:</span>
+    <div class="new-ticket-input-group">
+      <input type="text" bind:value={newTicket.title} />
+    </div>
+  </div>
+  <div class="new-ticket-group">
+    <span>Description:</span>
+    <div class="new-ticket-input-group">
+      <textarea bind:value={newTicket.description} />
+    </div>
+  </div>
+  <div class="new-ticket-group">
+    <span>Assigned To:</span>
+    <div class="new-ticket-input-group">
+      <select bind:value={newTicket.assignedTo}>
+        <option selected>Unassigned</option>
+        {#await availableUsers then availableUsers}
+          {#each availableUsers as user}
+            <option value={user.id} selected={user.id == newTicket.assignedTo}
+              >{user.name}</option
+            >
+          {/each}
+        {/await}
+      </select>
+    </div>
+  </div>
+  <div class="new-ticket-action-group">
+    <button on:click={resetTicket}>Reset</button>
+    <button on:click={saveTicket}>Save</button>
+  </div>
+</div>
+
+<style>
+  .new-ticket {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+  }
+  .new-ticket-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .new-ticket-group > span {
+    width: 20%;
+  }
+  .new-ticket-input-group {
+    display: flex;
+    flex-grow: 1;
+  }
+  .new-ticket-input-group > input {
+    width: 100%;
+  }
+  .new-ticket-input-group > textarea {
+    width: 100%;
+    height: 65px;
+    font-family: sans-serif;
+    resize: none;
+  }
+  .new-ticket-action-group {
+    display: flex;
+    justify-content: end;
+    margin-top: 20px;
+  }
+  .new-ticket-action-group > button {
+    margin-left: 5px;
+  }
+</style>

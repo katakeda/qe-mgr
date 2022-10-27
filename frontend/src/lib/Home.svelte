@@ -3,9 +3,9 @@
   import Board from './Board.svelte';
   import type { Ticket } from './types.svelte';
 
-  let newTickets,
-    pendingTickets,
-    acceptedTickets,
+  let newTickets: Array<Ticket>,
+    pendingTickets: Array<Ticket>,
+    acceptedTickets: Array<Ticket>,
     rejectedTickets: Array<Ticket>;
   (async () => {
     const response = await fetch('/api/tickets/');
@@ -24,10 +24,10 @@
 
 <div class="home">
   <Modal>
-    <Board title="Ready For Review" tickets={newTickets} />
-    <Board title="In Review" tickets={pendingTickets} />
-    <Board title="Accepted" tickets={acceptedTickets} />
-    <Board title="Rejected" tickets={rejectedTickets} />
+    <Board title="Ready For Review" status="New" tickets={newTickets} />
+    <Board title="In Review" status="Pending" tickets={pendingTickets} />
+    <Board title="Accepted" status="Complete" tickets={acceptedTickets} />
+    <Board title="Rejected" status="Rejected" tickets={rejectedTickets} />
   </Modal>
 </div>
 
