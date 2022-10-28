@@ -178,7 +178,7 @@
       </div>
     {:else}
       <div class="card-detail-label-group">
-        <span>{ticket.status}</span>
+        <span>{statuses.find((s) => s.value === ticket.status)?.label}</span>
       </div>
       <div class="card-detail-button-group">
         <button on:click={() => (editingStatus = true)}>Edit</button>
