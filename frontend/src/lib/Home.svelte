@@ -9,11 +9,7 @@
     rejectedTickets: Array<Ticket>;
   (async () => {
     const response = await fetch('/api/tickets/');
-    let tickets: Array<Ticket> = await response.json();
-    tickets = tickets.map((ticket) => ({
-      ...ticket,
-      assignedTo: ticket.assigned_to?.name,
-    }));
+    const tickets: Array<Ticket> = await response.json();
 
     newTickets = tickets.filter((ticket) => ticket.status == 'New');
     pendingTickets = tickets.filter((ticket) => ticket.status == 'Pending');

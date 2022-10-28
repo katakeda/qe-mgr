@@ -1,19 +1,15 @@
 <script lang="ts">
-  import type { Ticket, User } from './types.svelte';
   export let ticket: Ticket;
+  import { getContext } from 'svelte';
+  import type Modal from 'svelte-simple-modal';
+  import type { Ticket, User } from './types.svelte';
+  const { close }: Modal = getContext('simple-modal');
 
   let editingTitle = false;
   let editingDescription = false;
   let editingAssignedTo = false;
   let editingStatus = false;
   let updatedTicket = { ...ticket };
-  let availableUsers: Array<User>;
-
-  (async () => {
-    const response = await fetch('/api/users/');
-    const users = await response.json();
-    availableUsers = users;
-  })();
 
   const statuses = [
     { value: 'New', label: 'Ready For Review' },
@@ -21,6 +17,12 @@
     { value: 'Complete', label: 'Accepted' },
     { value: 'Rejected', label: 'Rejected' },
   ];
+
+  const getUsers = async (): Promise<Array<User>> => {
+    const response = await fetch('/api/users/');
+    return await response.json();
+  };
+  let availableUsers = getUsers();
 
   const resetTicket = (field: string) => {
     const clone = { ...ticket };
@@ -36,7 +38,13 @@
     const response = await fetch(`/api/tickets/${ticket.id}`, options);
     const savedTicket = await response.json();
     updatedTicket = savedTicket[0];
-    ticket = { ...updatedTicket };
+    ticket = structuredClone(updatedTicket);
+  };
+
+  const deleteTicket = async () => {
+    const options = { method: 'DELETE' };
+    await fetch(`/api/tickets/${ticket.id}`, options);
+    close();
   };
 </script>
 
@@ -102,14 +110,17 @@
     <span>Assigned To: </span>
     {#if editingAssignedTo}
       <div class="card-detail-label-group">
-        <select bind:value={updatedTicket.assigned_to.id}>
-          {#each availableUsers as user}
-            <option
-              value={user.id}
-              selected={user.id == updatedTicket.assigned_to.id}
-              >{user.name}</option
-            >
-          {/each}
+        <select bind:value={updatedTicket.assigned_to}>
+          <option default selected value={{ id: '' }}>Unassigned</option>
+          {#await availableUsers then availableUsers}
+            {#each availableUsers as user}
+              <option
+                value={user}
+                selected={user.id == updatedTicket.assigned_to?.id}
+                >{user.name}</option
+              >
+            {/each}
+          {/await}
         </select>
       </div>
       <div class="card-detail-button-group">
@@ -122,13 +133,15 @@
         <button
           on:click={() => {
             editingAssignedTo = false;
-            saveTicket({ assigned_to: updatedTicket.assigned_to.id });
+            saveTicket({ assigned_to: updatedTicket.assigned_to?.id });
           }}>Save</button
         >
       </div>
     {:else}
       <div class="card-detail-label-group">
-        <span>{ticket.assigned_to.name}</span>
+        <span
+          >{ticket.assigned_to ? ticket.assigned_to.name : 'Unassigned'}</span
+        >
       </div>
       <div class="card-detail-button-group">
         <button on:click={() => (editingAssignedTo = true)}>Edit</button>
@@ -172,6 +185,9 @@
       </div>
     {/if}
   </div>
+  <div class="card-detail-action-group">
+    <button on:click={deleteTicket}>Delete</button>
+  </div>
 </div>
 
 <style>
@@ -205,5 +221,20 @@
     height: 65px;
     font-family: sans-serif;
     resize: none;
+  }
+  .card-detail-action-group {
+    display: flex;
+    justify-content: end;
+    margin-top: 20px;
+  }
+  .card-detail-action-group > button {
+    background-color: #f44336;
+    color: #fff;
+    border-radius: 3px;
+    border: none;
+    padding: 3px 6px;
+  }
+  button {
+    cursor: pointer;
   }
 </style>

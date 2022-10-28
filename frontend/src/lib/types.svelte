@@ -10,6 +10,5 @@
     description?: string;
     status?: string;
     assigned_to?: User;
-    assignedTo?: string;
   }
 </script>

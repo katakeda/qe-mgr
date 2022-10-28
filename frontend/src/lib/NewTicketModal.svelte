@@ -23,7 +23,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...newTicket,
-        assigned_to: newTicket.assignedTo,
+        assigned_to: newTicket.assigned_to?.id,
         status,
       }),
     };
@@ -49,13 +49,16 @@
   <div class="new-ticket-group">
     <span>Assigned To:</span>
     <div class="new-ticket-input-group">
-      <select bind:value={newTicket.assignedTo}>
-        <option selected>Unassigned</option>
+      <select bind:value={newTicket.assigned_to}>
+        <option default selected>Unassigned</option>
         {#await availableUsers then availableUsers}
           {#each availableUsers as user}
-            <option value={user.id} selected={user.id == newTicket.assignedTo}
-              >{user.name}</option
+            <option
+              value={user}
+              selected={user.id == newTicket.assigned_to?.id}
             >
+              {user.name}
+            </option>
           {/each}
         {/await}
       </select>

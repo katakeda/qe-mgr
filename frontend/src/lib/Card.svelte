@@ -1,10 +1,6 @@
 <script lang="ts">
   import type { Ticket } from './types.svelte';
-  export let ticket: Ticket = {
-    title: 'New Card',
-    description: '',
-    assignedTo: 'Unassigned',
-  };
+  export let ticket: Ticket = {};
 
   import { getContext } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -35,7 +31,9 @@
   <div class="card-detail" on:click={openCardDetail} on:keypress={null}>
     <div class="card-title">{ticket.title}</div>
     <div class="card-description">{ticket.description}</div>
-    <div class="card-assigned-to">{ticket.assignedTo}</div>
+    <div class="card-assigned-to">
+      {ticket.assigned_to ? ticket.assigned_to.name : 'Unassigned'}
+    </div>
   </div>
   {#if showCardCtrls}
     <div class="card-ctrls" transition:fade={{ duration: 250 }}>
