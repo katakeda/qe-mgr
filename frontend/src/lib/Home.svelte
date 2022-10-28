@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Modal from 'svelte-simple-modal';
+  import { tickets, updateTickets } from './stores';
   import Board from './Board.svelte';
   import type { Ticket } from './types.svelte';
 
@@ -7,15 +9,15 @@
     pendingTickets: Array<Ticket>,
     acceptedTickets: Array<Ticket>,
     rejectedTickets: Array<Ticket>;
-  (async () => {
-    const response = await fetch('/api/tickets/');
-    const tickets: Array<Ticket> = await response.json();
 
+  onMount(updateTickets);
+
+  tickets.subscribe((tickets) => {
     newTickets = tickets.filter((ticket) => ticket.status == 'New');
     pendingTickets = tickets.filter((ticket) => ticket.status == 'Pending');
     acceptedTickets = tickets.filter((ticket) => ticket.status == 'Complete');
     rejectedTickets = tickets.filter((ticket) => ticket.status == 'Rejected');
-  })();
+  });
 </script>
 
 <div class="home">

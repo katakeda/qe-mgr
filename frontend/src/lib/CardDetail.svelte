@@ -2,6 +2,7 @@
   export let ticket: Ticket;
   import { getContext } from 'svelte';
   import type Modal from 'svelte-simple-modal';
+  import { updateTickets } from './stores';
   import type { Ticket, User } from './types.svelte';
   const { close }: Modal = getContext('simple-modal');
 
@@ -39,11 +40,13 @@
     const savedTicket = await response.json();
     updatedTicket = savedTicket[0];
     ticket = structuredClone(updatedTicket);
+    updateTickets();
   };
 
   const deleteTicket = async () => {
     const options = { method: 'DELETE' };
     await fetch(`/api/tickets/${ticket.id}`, options);
+    updateTickets();
     close();
   };
 </script>

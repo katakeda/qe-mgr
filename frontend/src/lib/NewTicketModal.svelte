@@ -2,6 +2,7 @@
   export let status: String;
   import { getContext } from 'svelte';
   import type Modal from 'svelte-simple-modal';
+  import { updateTickets } from './stores';
   import type { Ticket, User } from './types.svelte';
   const { close }: Modal = getContext('simple-modal');
 
@@ -29,6 +30,7 @@
     };
     const response = await fetch('/api/tickets/', options);
     await response.json();
+    updateTickets();
     close();
   };
 </script>
