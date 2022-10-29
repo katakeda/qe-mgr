@@ -4,6 +4,11 @@
     name?: string;
   }
 
+  export interface Team {
+    id?: string;
+    name?: string;
+  }
+
   export interface Ticket {
     id?: string;
     title?: string;

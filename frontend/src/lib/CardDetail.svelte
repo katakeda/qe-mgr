@@ -2,7 +2,7 @@
   export let ticket: Ticket;
   import { getContext } from 'svelte';
   import type Modal from 'svelte-simple-modal';
-  import { updateTickets } from './stores';
+  import { users, refreshTickets } from './stores';
   import type { Ticket, User } from './types.svelte';
   const { close }: Modal = getContext('simple-modal');
 
@@ -19,11 +19,10 @@
     { value: 'Rejected', label: 'Rejected' },
   ];
 
-  const getUsers = async (): Promise<Array<User>> => {
-    const response = await fetch('/api/users/');
-    return await response.json();
-  };
-  let availableUsers = getUsers();
+  let availableUsers: Array<User> = [];
+  users.subscribe((users) => {
+    availableUsers = users;
+  });
 
   const resetTicket = (field: string) => {
     const clone = { ...ticket };
@@ -40,13 +39,13 @@
     const savedTicket = await response.json();
     updatedTicket = savedTicket[0];
     ticket = structuredClone(updatedTicket);
-    updateTickets();
+    refreshTickets();
   };
 
   const deleteTicket = async () => {
     const options = { method: 'DELETE' };
     await fetch(`/api/tickets/${ticket.id}`, options);
-    updateTickets();
+    refreshTickets();
     close();
   };
 </script>
@@ -115,15 +114,13 @@
       <div class="card-detail-label-group">
         <select bind:value={updatedTicket.assigned_to}>
           <option default selected value={{ id: '' }}>Unassigned</option>
-          {#await availableUsers then availableUsers}
-            {#each availableUsers as user}
-              <option
-                value={user}
-                selected={user.id == updatedTicket.assigned_to?.id}
-                >{user.name}</option
-              >
-            {/each}
-          {/await}
+          {#each availableUsers as user}
+            <option
+              value={user}
+              selected={user.id == updatedTicket.assigned_to?.id}
+              >{user.name}</option
+            >
+          {/each}
         </select>
       </div>
       <div class="card-detail-button-group">
@@ -235,7 +232,7 @@
     color: #fff;
     border-radius: 3px;
     border: none;
-    padding: 3px 6px;
+    padding: 4px 6px 3px;
   }
   button {
     cursor: pointer;

@@ -2,17 +2,15 @@
   export let status: String;
   import { getContext } from 'svelte';
   import type Modal from 'svelte-simple-modal';
-  import { updateTickets } from './stores';
+  import { refreshTickets, users } from './stores';
   import type { Ticket, User } from './types.svelte';
   const { close }: Modal = getContext('simple-modal');
 
-  const getUsers = async (): Promise<Array<User>> => {
-    const response = await fetch('/api/users/');
-    return await response.json();
-  };
-
-  let availableUsers = getUsers();
   let newTicket: Ticket = {};
+  let availableUsers: Array<User> = [];
+  users.subscribe((users) => {
+    availableUsers = users;
+  });
 
   const resetTicket = () => {
     newTicket = {};
@@ -30,7 +28,7 @@
     };
     const response = await fetch('/api/tickets/', options);
     await response.json();
-    updateTickets();
+    refreshTickets();
     close();
   };
 </script>
@@ -53,16 +51,11 @@
     <div class="new-ticket-input-group">
       <select bind:value={newTicket.assigned_to}>
         <option default selected>Unassigned</option>
-        {#await availableUsers then availableUsers}
-          {#each availableUsers as user}
-            <option
-              value={user}
-              selected={user.id == newTicket.assigned_to?.id}
-            >
-              {user.name}
-            </option>
-          {/each}
-        {/await}
+        {#each availableUsers as user}
+          <option value={user} selected={user.id == newTicket.assigned_to?.id}>
+            {user.name}
+          </option>
+        {/each}
       </select>
     </div>
   </div>

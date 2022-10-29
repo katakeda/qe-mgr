@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Modal from 'svelte-simple-modal';
-  import { tickets, updateTickets } from './stores';
+  import { tickets, refreshTickets, refreshUsers } from './stores';
   import Board from './Board.svelte';
   import type { Ticket } from './types.svelte';
 
@@ -10,7 +10,8 @@
     acceptedTickets: Array<Ticket>,
     rejectedTickets: Array<Ticket>;
 
-  onMount(updateTickets);
+  onMount(refreshTickets);
+  onMount(refreshUsers);
 
   tickets.subscribe((tickets) => {
     newTickets = tickets.filter((ticket) => ticket.status == 'New');
