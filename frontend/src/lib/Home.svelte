@@ -35,6 +35,7 @@
     height: calc(100vh - 85px);
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    margin: 0 48px;
   }
 </style>
