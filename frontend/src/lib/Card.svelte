@@ -66,6 +66,8 @@
   }
   .card-detail {
     padding: 10px;
+    font-family: sans-serif;
+    font-size: 14px;
   }
   .card-ctrls {
     display: flex;
