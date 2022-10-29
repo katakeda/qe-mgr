@@ -1,11 +1,68 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import svelteLogo from '../assets/svelte.svg';
+  import { currentTeam, refreshTickets, updateCurrentTeam } from './stores';
+  import type { Team } from './types.svelte';
+
+  let allTeams: Array<Team> = [];
+  let filteredTeams: Array<Team> = [];
+  let team: string = '';
+  currentTeam.subscribe((currentTeam) => {
+    team = currentTeam;
+  });
+
+  const getTeams = async () => {
+    allTeams = await [
+      { name: 'panthers' },
+      { name: 'panthers-qe' },
+      { name: 'hippos' },
+      { name: 'hippos-qe' },
+      { name: 'buffaloes' },
+    ];
+  };
+
+  const filterTeams = (
+    e: InputEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) => {
+    filteredTeams = allTeams.filter((team) =>
+      team.name.includes(e.currentTarget.value)
+    );
+  };
+
+  const submitTeam = (
+    e: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) => {
+    if (e.key === 'Enter') {
+      const team = e.currentTarget.value;
+      if (allTeams.find((t) => t.name === team)) {
+        updateCurrentTeam(team);
+        refreshTickets();
+      }
+    }
+  };
+
+  onMount(getTeams);
 </script>
 
 <header>
   <div class="header-item">
     <img class="header-logo" src={svelteLogo} alt="logo" />
     <span class="header-title">QE Manager</span>
+  </div>
+  <div class="header-item">
+    <div class="header-team-switcher">
+      <input
+        list="teams"
+        value={team}
+        on:input={filterTeams}
+        on:keypress={submitTeam}
+      />
+      <datalist id="teams">
+        {#each filteredTeams as team}
+          <option>{team.name}</option>
+        {/each}
+      </datalist>
+    </div>
   </div>
 </header>
 
@@ -26,5 +83,16 @@
     font-size: 32px;
     margin-left: 8px;
     color: #808080;
+  }
+  .header-team-switcher {
+    border: 1px solid #d3d3d3;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+  }
+  .header-team-switcher > input {
+    border: none;
+    outline: none;
+    padding: 10px;
   }
 </style>
