@@ -10,15 +10,15 @@
     acceptedTickets: Array<Ticket>,
     rejectedTickets: Array<Ticket>;
 
-  onMount(refreshTickets);
-  onMount(refreshUsers);
-
   tickets.subscribe((tickets) => {
     newTickets = tickets.filter((ticket) => ticket.status == 'New');
     pendingTickets = tickets.filter((ticket) => ticket.status == 'Pending');
     acceptedTickets = tickets.filter((ticket) => ticket.status == 'Complete');
     rejectedTickets = tickets.filter((ticket) => ticket.status == 'Rejected');
   });
+
+  onMount(refreshTickets);
+  onMount(refreshUsers);
 </script>
 
 <div class="home">

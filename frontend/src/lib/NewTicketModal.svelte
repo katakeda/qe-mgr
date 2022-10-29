@@ -2,14 +2,22 @@
   export let status: String;
   import { getContext } from 'svelte';
   import type Modal from 'svelte-simple-modal';
-  import { refreshTickets, users } from './stores';
-  import type { Ticket, User } from './types.svelte';
+  import { currentTeam, refreshTickets, teams, users } from './stores';
+  import type { Team, Ticket, User } from './types.svelte';
   const { close }: Modal = getContext('simple-modal');
 
   let newTicket: Ticket = {};
   let availableUsers: Array<User> = [];
+  let team_id: string = '';
+  let allTeams: Array<Team> = [];
   users.subscribe((users) => {
     availableUsers = users;
+  });
+  teams.subscribe((teams) => {
+    allTeams = teams;
+  });
+  currentTeam.subscribe((currentTeam) => {
+    team_id = allTeams.find((team) => team.name === currentTeam)?.id;
   });
 
   const resetTicket = () => {
@@ -24,6 +32,7 @@
         ...newTicket,
         assigned_to: newTicket.assigned_to?.id,
         status,
+        team_id,
       }),
     };
     const response = await fetch('/api/tickets/', options);

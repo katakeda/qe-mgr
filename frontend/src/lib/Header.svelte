@@ -1,20 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import svelteLogo from '../assets/svelte.svg';
-  import { currentTeam, refreshTickets, updateCurrentTeam } from './stores';
   import type { Team } from './types.svelte';
+  import {
+    currentTeam,
+    refreshTickets,
+    teams,
+    updateCurrentTeam,
+  } from './stores';
 
   let allTeams: Array<Team> = [];
   let filteredTeams: Array<Team> = [];
   let team: string = '';
+  teams.subscribe((teams) => {
+    allTeams = teams;
+  });
   currentTeam.subscribe((currentTeam) => {
     team = currentTeam;
   });
-
-  const getTeams = async () => {
-    const response = await fetch('/api/teams/');
-    allTeams = await response.json();
-  };
 
   const filterTeams = (
     e: InputEvent & { currentTarget: EventTarget & HTMLInputElement }
@@ -35,8 +38,6 @@
       }
     }
   };
-
-  onMount(getTeams);
 </script>
 
 <header>
