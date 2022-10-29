@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     model::{
+        team::Team,
         ticket::{Ticket, TicketStatus},
         user::User,
     },
@@ -19,6 +20,7 @@ use crate::{
 #[derive(Deserialize)]
 pub struct TicketFilter {
     pub status: Option<TicketStatus>,
+    pub team: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -27,6 +29,7 @@ pub struct CreateTicket {
     pub description: Option<String>,
     pub status: Option<TicketStatus>,
     pub assigned_to: Option<String>,
+    pub team_id: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -35,6 +38,7 @@ pub struct UpdateTicket {
     pub description: Option<String>,
     pub status: Option<TicketStatus>,
     pub assigned_to: Option<String>,
+    pub team_id: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -45,6 +49,7 @@ pub struct TicketResponse {
     pub status: TicketStatus,
     pub created_by: Option<User>,
     pub assigned_to: Option<User>,
+    pub team: Option<Team>,
 }
 
 #[get("/{id}")]
@@ -77,6 +82,7 @@ pub async fn create(
         description: body.description.clone().unwrap_or("".into()),
         status: body.status.clone().unwrap_or(TicketStatus::New),
         assigned_to: body.assigned_to.clone().unwrap_or("".into()),
+        team_id: body.team_id.clone().unwrap_or("".into()),
         created_by: user_id,
     };
     repo.create_ticket(ticket.clone());
@@ -104,6 +110,7 @@ pub async fn update(
                     .assigned_to
                     .clone()
                     .unwrap_or(ticket.assigned_to.clone()),
+                team_id: body.team_id.clone().unwrap_or(ticket.team_id.clone()),
                 created_by: ticket.created_by.clone(),
             };
             repo.create_ticket(ticket.clone());
@@ -117,6 +124,7 @@ pub async fn update(
                 description: body.description.clone().unwrap_or("".into()),
                 status: body.status.clone().unwrap_or(TicketStatus::New),
                 assigned_to: body.assigned_to.clone().unwrap_or("".into()),
+                team_id: body.team_id.clone().unwrap_or("".into()),
                 created_by: user_id,
             };
             repo.create_ticket(ticket.clone());
@@ -150,6 +158,7 @@ fn create_ticket_response(ticket: Ticket, repo: Data<Inmem>) -> TicketResponse {
         status: ticket.status.clone(),
         assigned_to: repo.get_user(ticket.assigned_to.clone()),
         created_by: repo.get_user(ticket.created_by.clone()),
+        team: repo.get_team(ticket.team_id.clone()),
     }
 }
 

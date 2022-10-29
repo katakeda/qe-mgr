@@ -16,4 +16,5 @@ pub struct Ticket {
     pub status: TicketStatus,
     pub created_by: String,
     pub assigned_to: String,
+    pub team_id: String,
 }

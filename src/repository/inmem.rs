@@ -111,6 +111,13 @@ impl Inmem {
             .collect()
     }
 
+    pub fn get_team(&self, id: String) -> Option<Team> {
+        match self.teams.lock().unwrap().get(&id) {
+            Some(team) => Some(team.clone()),
+            None => None,
+        }
+    }
+
     pub fn create_team(&self, team: Team) {
         self.teams.lock().unwrap().insert(team.id.clone(), team);
     }
@@ -121,11 +128,19 @@ impl Inmem {
             .unwrap()
             .iter()
             .filter(|(_, ticket)| {
+                let mut filtered = true;
                 if let Some(status) = &filter.status {
-                    *status == ticket.status
-                } else {
-                    true
+                    filtered &= *status == ticket.status;
                 }
+                if let Some(team) = &filter.team {
+                    if !team.trim().is_empty() {
+                        match self.get_team(ticket.team_id.clone()) {
+                            Some(t) => filtered &= *team == t.name,
+                            None => filtered &= false,
+                        }
+                    }
+                }
+                filtered
             })
             .map(|(_, ticket)| ticket.clone())
             .collect()
