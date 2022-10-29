@@ -12,13 +12,8 @@
   });
 
   const getTeams = async () => {
-    allTeams = await [
-      { name: 'panthers' },
-      { name: 'panthers-qe' },
-      { name: 'hippos' },
-      { name: 'hippos-qe' },
-      { name: 'buffaloes' },
-    ];
+    const response = await fetch('/api/teams/');
+    allTeams = await response.json();
   };
 
   const filterTeams = (
