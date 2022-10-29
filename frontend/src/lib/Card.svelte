@@ -49,7 +49,6 @@
 
 <style>
   .card {
-    width: 100%;
     min-height: 80px;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
       0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -68,6 +67,10 @@
     padding: 10px;
     font-family: sans-serif;
     font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #4c4e52;
   }
   .card-ctrls {
     display: flex;

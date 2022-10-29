@@ -90,6 +90,6 @@
   .header-team-switcher > input {
     border: none;
     outline: none;
-    padding: 10px;
+    padding: 9px;
   }
 </style>
