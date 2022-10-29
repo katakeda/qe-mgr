@@ -49,6 +49,7 @@
     <div class="header-team-switcher">
       <input
         list="teams"
+        placeholder="Select Team"
         value={team}
         on:input={filterTeams}
         on:keypress={submitTeam}
