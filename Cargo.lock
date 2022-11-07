@@ -790,7 +790,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "qe-mgr-api"
+name = "qe-mgr"
 version = "0.1.0"
 dependencies = [
  "actix-files",
