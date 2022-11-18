@@ -1,14 +1,12 @@
+use crate::{
+    api::ticket::TicketFilter,
+    model::{team::Team, ticket::Ticket, user::User},
+};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fs,
     sync::{Arc, Mutex},
-};
-
-use serde::{Deserialize, Serialize};
-
-use crate::{
-    api::ticket::TicketFilter,
-    model::{team::Team, ticket::Ticket, user::User},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -32,7 +30,9 @@ impl Drop for Inmem {
             tickets: self.tickets.clone().lock().unwrap().clone(),
             teams: self.teams.clone().lock().unwrap().clone(),
         };
-        fs::write(&self.file_name, serde_json::ser::to_string(&data).unwrap()).unwrap();
+        if let Ok(contents) = serde_json::ser::to_string(&data) {
+            fs::write(&self.file_name, contents).expect("failed to write to data file");
+        }
     }
 }
 
@@ -81,7 +81,6 @@ impl Inmem {
             .lock()
             .unwrap()
             .iter()
-            .filter(|(_, _user)| true)
             .map(|(_, user)| user.clone())
             .collect()
     }
@@ -106,7 +105,6 @@ impl Inmem {
             .lock()
             .unwrap()
             .iter()
-            .filter(|(_, _team)| true)
             .map(|(_, team)| team.clone())
             .collect()
     }
